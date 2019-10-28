@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
+# TODO : Clean the code....
 def crawl_response_page(anchor):
 	print(anchor["href"])
 	question = anchor["href"].split(r"/")[-1]
@@ -14,6 +15,7 @@ def crawl_response_page(anchor):
 	print(f"Response {res.status_code}")
 	divs = soup.findAll("div", {"class": "kmsgtext"})
 	for msg in divs:
+		# TODO : Create dir if it does not exists.
 		with open(f"crawled_intra/responses", "a") as f:
 			print(f"Writting {question} to responses")
 			f.write("==========================")
