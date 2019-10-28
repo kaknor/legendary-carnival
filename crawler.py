@@ -1,8 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
+from pathlib import Path
 
 # TODO : Clean the code....
-def crawl_response_page(anchor):
+def crawl_response_page(output_file, anchor):
 	print(anchor["href"])
 	question = anchor["href"].split(r"/")[-1]
 	print(question)
@@ -16,11 +17,9 @@ def crawl_response_page(anchor):
 	divs = soup.findAll("div", {"class": "kmsgtext"})
 	for msg in divs:
 		# TODO : Create dir if it does not exists.
-		with open(f"crawled_intra/responses", "a") as f:
 			print(f"Writting {question} to responses")
-			f.write("==========================")
-			f.write(msg.text)
-			f.write("==========================")
+			output_file.write(msg.text)
+			output_file.write("\n")
 
 def crawl_page(page_number=-1):
 	print("###############################################")
@@ -33,10 +32,17 @@ def crawl_page(page_number=-1):
 
 	soup = BeautifulSoup(r.content, features="html.parser")
 	count_pages = 0
-	for anchor in soup.findAll("a", {"class": "ktopic-title km"}, href=True):
-		crawl_response_page(anchor)
-		count_pages += 1
-		print(f"TOTAL NUMBER OF PAGES {count_pages}")
+	equals = '=' * 12
+	dir_name = "crawled_intra"
+	dir_path = Path(dir_name)
+	dir_path.mkdir(exist_ok=True)
+	with open(dir_path / "responses", "a") as f:
+		for anchor in soup.findAll("a", {"class": "ktopic-title km"}, href=True):
+			f.write(f"{equals} New page {equals}\n")
+			crawl_response_page(f, anchor)
+			f.write(f"{equals} End Page {equals}\n")
+			count_pages += 1
+			print(f"TOTAL NUMBER OF PAGES {count_pages}")
 
 if __name__ == "__main__":
 	crawl_page()
